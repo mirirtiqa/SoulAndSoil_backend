@@ -14,8 +14,8 @@ export const signin = async(req, res)=>{
         const augmentedUserData = new User({
             name:userData.name,
             email:userData.email,
-            currentAddress: userData.currentAddress || "",
-            age:userData.age || "",
+            currentAddress: "",
+            age:"",
             token: userData.token || "",
             currentReservations:[],
             pastReservations:[],
@@ -29,7 +29,24 @@ export const signin = async(req, res)=>{
         res.status(500).json({error:"Internal error"});
     }
 }
+export const login = async(req,res)=>{
+    try{
+        const userData = req.body
+        const {email}= userData;
 
+        const userExist = await User.findOne({email})
+
+        if(userExist){
+            return res.status(200).json(userExist);
+        }
+        return res.status(404).json("User not ---found")
+
+    }
+    catch{
+        res.status(500).json({error:"Internal error"});
+    }
+
+}
 export const getDetails = async(req,res)=>{
     try{
         const {userId} = req.params;

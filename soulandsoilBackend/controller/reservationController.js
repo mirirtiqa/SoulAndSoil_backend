@@ -14,11 +14,17 @@ export const reserveSpot = async(req,res)=>{
             if(!picnic){
                 throw new Error("Picnic not found")
             }
+            const availableSpots = Number(picnic.availableSpots)-1;
+
+            if(availableSpots < 0){
+                throw new Error("No available spots")
+            }
+
 
             //add the userid to the reservations for the picnic
             const updatedPicnic = await Picnic.findByIdAndUpdate(
                 picnicId,
-                { $push: { reservations: userId } },
+                { $push: { reservations: userId }, availableSpots: availableSpots },
                 { new: true}
             );
 
@@ -29,14 +35,15 @@ export const reserveSpot = async(req,res)=>{
             //add the picnic details to users currentReservation record:
             const picnicDetails = {
                 picnicId: picnicId,
+                title: picnic.title,
                 location: picnic.location,
                 date: picnic.date,
-                picnicDetails: picnic.details,
+                category: picnic.category,
             }
 
             const updatedUser= await User.findByIdAndUpdate(
                 userId,
-                { $push: { currentReservations: reservationDetails } },
+                { $push: { currentReservations: picnicDetails } },
                 { new: true} );
             
             if (!updatedUser) {
